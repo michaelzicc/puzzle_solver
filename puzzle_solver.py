@@ -195,13 +195,27 @@ def ends_match(top, bottom):
 	else:
 		return False
 		
-def check_pieces(pieces):
-	if sides_match(pieces[0], pieces[1]) and sides_match(pieces[1], pieces[2]) and \
-	sides_match(pieces[3], pieces[4]) and sides_match(pieces[4], pieces[5]) and \
-	sides_match(pieces[6], pieces[7]) and sides_match(pieces[7], pieces[8]) and \
-	ends_match(pieces[0], pieces[3]) and ends_match(pieces[3], pieces[6]) and \
-	ends_match(pieces[1], pieces[4]) and ends_match(pieces[4], pieces[7]) and \
-	ends_match(pieces[2], pieces[5]) and ends_match(pieces[5], pieces[8]):
+def check_solution(pieces, width):
+	j = 0
+	okay = True
+	for piece in pieces:
+		above_index = j-width
+		j+=1
+		if j % width == 1:			
+			if above_index >= 0:
+				okay = ends_match(pieces[above_index], piece)
+			else:
+				continue
+		else:
+			if width > 1:
+				okay = sides_match(pieces[j-2], piece)
+			if above_index >= 0:
+				okay = okay and ends_match(pieces[above_index], piece)
+			else:
+				continue
+		if not okay:
+			break
+	if okay:
 		print('Solution Checks Out')
 		return True
 	else:
@@ -224,19 +238,25 @@ def main():
 	pieces = puzzle.pieces
 	global Total_Unique_Edges 
 	Total_Unique_Edges = puzzle.total_unique_edges
-	#random.shuffle(pieces)
+	
+	shuffle = ''
+	while shuffle.lower() not in ['yes', 'no', 'y', 'n']:
+		shuffle = get_input('Do you want to shuffle the pieces? (y/n) ', "string")
+	if shuffle.lower() in ['yes', 'y']:
+		random.shuffle(pieces)
 	print('Starting Board: ...')
 	print_pieces(pieces)
 	solution_okay = True
 	solution_found, solution = sort_pieces(pieces, len(pieces), puzzle.width, puzzle.height, 1, 1)
 	if solution_found:
-		solution_okay = True # check_pieces(solution)
-	if solution_okay:
-		print('Solution Found!')
-		print("Combinations Checked: " + str(Trials))
-		print_pieces(solution)
+		solution_okay = check_solution(solution, puzzle.width)
+		if solution_okay:
+			print('Solution Found!')
+			print("Combinations Checked: " + str(Trials))
+			print_pieces(solution)
+		else:
+			print('Solution Not Found')
 	else:
-		print('Solution Not Found')
-	
+		print('No solutions exist')
 	
 main()

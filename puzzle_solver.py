@@ -190,7 +190,7 @@ def print_and_increment_trials(piece_ids):
 	return
 
 def ends_match(top, bottom):
-	if top.bottom + bottom.top == 9:
+	if top.bottom + bottom.top == Total_Unique_Edges + 1:
 		return True
 	else:
 		return False
